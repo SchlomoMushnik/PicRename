@@ -3,7 +3,7 @@ from typing import Optional, Union
 from datetime import datetime
 from PIL import Image, ExifTags
 
-def get_DateTimeOriginal(pfad: Union[str, Path]) -> Optional[datetime]:
+def get_jpg_DateTimeOriginal(pfad: Union[str, Path]) -> Optional[datetime]:
     """
     Liest das EXIF-Feld 'DateTimeOriginal' aus der Bilddatei unter 'pfad'.
     Rückgabe: datetime-Objekt bei Erfolg, sonst None.
