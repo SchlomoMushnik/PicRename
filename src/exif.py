@@ -1,7 +1,31 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 from datetime import datetime
 from PIL import Image, ExifTags
+import re
+
+
+def get_DateTimeOriginal(pfad: Union[str, Path]) -> Tuple[Optional[datetime], bool]:
+    """
+    Liest das 'DateTimeOriginal' Datum aus einer Bilddatei (JPG oder PNG) unter 'pfad'.
+    Rückgabe: datetime-Objekt bei Erfolg, sonst None.
+    """
+    p = Path(pfad)
+    if not p.exists():
+        return None, False
+
+    suffix = p.suffix.lower()
+    if suffix in (".jpg", ".jpeg", ".tiff", ".jfif"):
+        return (get_jpg_DateTimeOriginal(p), False)
+    elif suffix == ".png":
+        jpg_path = convert_png_to_jpg(p)
+        if jpg_path:
+            return (get_jpg_DateTimeOriginal(jpg_path), True)
+        else:
+            return (None, False)
+    else:
+        return (None, False)
+
 
 def get_jpg_DateTimeOriginal(pfad: Union[str, Path]) -> Optional[datetime]:
     """
@@ -53,3 +77,22 @@ def get_jpg_DateTimeOriginal(pfad: Union[str, Path]) -> Optional[datetime]:
                 continue
 
     return None
+
+def convert_png_to_jpg(pfad: Union[str, Path]) -> Optional[Path]:
+        """
+        Konvertiert eine PNG-Bilddatei in das JPG-Format und speichert sie unter dem gleichen Namen mit der Endung .jpg.
+        Rückgabe: Pfad zur neuen JPG-Datei bei Erfolg, sonst None.
+        """
+        p = Path(pfad)
+        if not p.exists() or p.suffix.lower() != ".png":
+            return None
+
+        try:
+            with Image.open(p) as img:
+                rgb_img = img.convert("RGB")  # PNG kann Transparenz haben, daher Konvertierung zu RGB
+                jpg_path = p.with_suffix(".jpg")
+                rgb_img.save(jpg_path, "JPEG")
+                return jpg_path
+        except Exception:
+            return None
+

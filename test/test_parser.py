@@ -12,7 +12,7 @@ print("TEST IMPORT PATH:", Path(__file__).resolve().parents[1] / "src")
 print("PYTHONPATH:", sys.path)
 
 def test_scan_pics():
-    path = "/Volumes/Acasis/iCloud 2020 Test/2020"
+    path = "/Volumes/Acasis/source_pics"
     df = scan_pics(path)
     print(df)
     assert not df.empty
